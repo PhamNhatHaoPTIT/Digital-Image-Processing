@@ -56,6 +56,9 @@ public class HistogramProcessing extends javax.swing.JFrame {
         median = new javax.swing.JMenuItem();
         average = new javax.swing.JMenuItem();
         weighted = new javax.swing.JMenuItem();
+        sharp = new javax.swing.JMenu();
+        sobel = new javax.swing.JMenuItem();
+        laplacian = new javax.swing.JMenuItem();
         exit = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -178,6 +181,26 @@ public class HistogramProcessing extends javax.swing.JFrame {
         smooth.add(weighted);
 
         menu_file.add(smooth);
+
+        sharp.setText("Sharpening Filters");
+
+        sobel.setText("Using Sobel Operators");
+        sobel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sobelActionPerformed(evt);
+            }
+        });
+        sharp.add(sobel);
+
+        laplacian.setText("Using Laplacian Filter");
+        laplacian.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                laplacianActionPerformed(evt);
+            }
+        });
+        sharp.add(laplacian);
+
+        menu_file.add(sharp);
 
         exit.setText("Exit");
         exit.addActionListener(new java.awt.event.ActionListener() {
@@ -578,31 +601,38 @@ public class HistogramProcessing extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_minActionPerformed
-
-    private int aveValue(int[][] neighbor) {
-        double temp = 0;
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                temp += neighbor[i][j];
-            }
-        }
-        temp = temp / 9;
-        return (int)temp;
-    }
     
     private void averageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_averageActionPerformed
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        int[][] neighbor;
-        
-        for(int i = 1; i < width - 1; i++) {
-            for(int j = 1; j < height - 1; j++) {
-                neighbor = getNeighborMatrix(i, j);
-                outputImage[i][j] = aveValue(neighbor);
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                double gx =  val00 + val01 + val02 
+                        + val10 + val11 + val12
+                        + val20 + val21 +  val22;
+                gx /= 9;
+                int g = (int) gx;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
             }
         }
-        for(int i = 1; i < width - 1; i++) {
-            for(int j = 1; j < height - 1; j++) {
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
                 int color = outputImage[i][j];
                 Color col = new Color(color, color, color);
                 bufferedImage.setRGB(i, j, col.getRGB());
@@ -703,31 +733,36 @@ public class HistogramProcessing extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_medianActionPerformed
 
-    private int weightedValue(int[][] neighbor) {
-        
-        int temp = 0;
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                temp += neighbor[i][j];
-            }
-        }
-        temp = temp / 9;
-        return temp;
-    }
-    
     private void weightedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_weightedActionPerformed
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        int[][] neighbor;
-        
-        for(int i = 1; i < width - 1; i++) {
-            for(int j = 1; j < height - 1; j++) {
-                neighbor = getNeighborMatrix(i, j);
-                outputImage[i][j] = weightedValue(neighbor);
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                double gx = (val00 / 16) + (val01 * 2 /16) + (val02 / 16);
+                gx += (val10 * 2 / 16) + (val11 * 4 / 16) + (val12 * 2 / 16);
+                gx += (val20 / 16) + (val21 * 2 /16) + (val22 / 16);
+                int g = (int) gx;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
             }
         }
-        for(int i = 1; i < width - 1; i++) {
-            for(int j = 1; j < height - 1; j++) {
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
                 int color = outputImage[i][j];
                 Color col = new Color(color, color, color);
                 bufferedImage.setRGB(i, j, col.getRGB());
@@ -741,6 +776,102 @@ public class HistogramProcessing extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_weightedActionPerformed
+
+    private void sobelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sobelActionPerformed
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                int gx =  ((-1 * val00) + (0 * val01) + (1 * val02)) 
+                        + ((-2 * val10) + (0 * val11) + (2 * val12))
+                        + ((-1 * val20) + (0 * val21) + (1 * val22));
+
+                int gy =  ((-1 * val00) + (-2 * val01) + (-1 * val02))
+                        + ((0 * val10) + (0 * val11) + (0 * val12))
+                        + ((1 * val20) + (2 * val21) + (1 * val22));
+
+                double gval = Math.sqrt((gx * gx) + (gy * gy));
+                int g = (int) gval;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
+            }
+        }
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                int color = outputImage[i][j];
+                Color col = new Color(color, color, color);
+                bufferedImage.setRGB(i, j, col.getRGB());
+            }
+        }
+        try {
+            ImageIO.write(bufferedImage, "png", new File("sobel"+".png"));
+            JOptionPane.showMessageDialog(null, "Image saved in your project");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_sobelActionPerformed
+
+    private void laplacianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_laplacianActionPerformed
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                int gx =  ((0 * val00) + (-1 * val01) + (0 * val02)) 
+                        + ((-1 * val10) + (5 * val11) + (-1 * val12))
+                        + ((0 * val20) + (-1 * val21) + (0 * val22));
+
+                double gval = Math.sqrt(gx * gx);
+                int g = (int) gval;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
+            }
+        }
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                int color = outputImage[i][j];
+                Color col = new Color(color, color, color);
+                bufferedImage.setRGB(i, j, col.getRGB());
+            }
+        }
+        try {
+            ImageIO.write(bufferedImage, "png", new File("laplacian"+".png"));
+            JOptionPane.showMessageDialog(null, "Image saved in your project");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_laplacianActionPerformed
 
   
     public static void main(String args[]) {
@@ -781,6 +912,7 @@ public class HistogramProcessing extends javax.swing.JFrame {
     private javax.swing.JMenuItem equalization;
     private javax.swing.JMenuItem exit;
     private javax.swing.JPanel graph;
+    private javax.swing.JMenuItem laplacian;
     private javax.swing.JMenuItem log;
     private javax.swing.JMenuItem max;
     private javax.swing.JMenuItem median;
@@ -790,8 +922,10 @@ public class HistogramProcessing extends javax.swing.JFrame {
     private javax.swing.JMenuItem open;
     private javax.swing.JMenuItem power;
     private javax.swing.JMenuItem save;
+    private javax.swing.JMenu sharp;
     private javax.swing.JMenuItem show;
     private javax.swing.JMenu smooth;
+    private javax.swing.JMenuItem sobel;
     private javax.swing.JMenu transformations;
     private javax.swing.JMenuItem weighted;
     // End of variables declaration//GEN-END:variables

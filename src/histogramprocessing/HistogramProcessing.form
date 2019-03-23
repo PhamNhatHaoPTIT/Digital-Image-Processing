@@ -119,6 +119,29 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <Menu class="javax.swing.JMenu" name="sharp">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Sharpening Filters"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="sobel">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Using Sobel Operators"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sobelActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="laplacian">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Using Laplacian Filter"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="laplacianActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="exit">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Exit"/>
