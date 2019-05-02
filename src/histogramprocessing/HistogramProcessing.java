@@ -59,6 +59,11 @@ public class HistogramProcessing extends javax.swing.JFrame {
         sharp = new javax.swing.JMenu();
         sobel = new javax.swing.JMenuItem();
         laplacian = new javax.swing.JMenuItem();
+        segment = new javax.swing.JMenu();
+        point = new javax.swing.JMenuItem();
+        line = new javax.swing.JMenuItem();
+        edge = new javax.swing.JMenuItem();
+        thres = new javax.swing.JMenuItem();
         exit = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -201,6 +206,42 @@ public class HistogramProcessing extends javax.swing.JFrame {
         sharp.add(laplacian);
 
         menu_file.add(sharp);
+
+        segment.setText("Image Segmentation");
+
+        point.setText("Point Detection");
+        point.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pointActionPerformed(evt);
+            }
+        });
+        segment.add(point);
+
+        line.setText("Line Detection");
+        line.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lineActionPerformed(evt);
+            }
+        });
+        segment.add(line);
+
+        edge.setText("Edge Detection");
+        edge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edgeActionPerformed(evt);
+            }
+        });
+        segment.add(edge);
+
+        menu_file.add(segment);
+
+        thres.setText("Thresholding");
+        thres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                thresActionPerformed(evt);
+            }
+        });
+        menu_file.add(thres);
 
         exit.setText("Exit");
         exit.addActionListener(new java.awt.event.ActionListener() {
@@ -873,6 +914,154 @@ public class HistogramProcessing extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_laplacianActionPerformed
 
+    private void pointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointActionPerformed
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                int gx =  ((-1 * val00) + (-1 * val01) + (-1 * val02)) 
+                        + ((-1 * val10) + (8 * val11) + (-1 * val12))
+                        + ((-1 * val20) + (-1 * val21) + (-1 * val22));
+
+                double gval = Math.sqrt(gx * gx);
+                int g = (int) gval;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
+            }
+        }
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                int color = outputImage[i][j];
+                Color col = new Color(color, color, color);
+                bufferedImage.setRGB(i, j, col.getRGB());
+            }
+        }
+        try {
+            ImageIO.write(bufferedImage, "png", new File("point"+".png"));
+            JOptionPane.showMessageDialog(null, "Image saved in your project");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_pointActionPerformed
+
+    // horizontal
+    private void lineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineActionPerformed
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                int gx =  ((-1 * val00) + (-1 * val01) + (-1 * val02)) 
+                        + ((2 * val10) + (2 * val11) + (2 * val12))
+                        + ((-1 * val20) + (-1 * val21) + (-1 * val22));
+
+                double gval = Math.sqrt(gx * gx);
+                int g = (int) gval;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
+            }
+        }
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                int color = outputImage[i][j];
+                Color col = new Color(color, color, color);
+                bufferedImage.setRGB(i, j, col.getRGB());
+            }
+        }
+        try {
+            ImageIO.write(bufferedImage, "png", new File("line"+".png"));
+            JOptionPane.showMessageDialog(null, "Image saved in your project");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_lineActionPerformed
+
+    // sobel
+    private void edgeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edgeActionPerformed
+        int x = bufferedImage.getWidth();
+        int y = bufferedImage.getHeight();
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+
+                int val00 = inputImage[i-1][j-1];
+                int val01 = inputImage[i-1][j];
+                int val02 = inputImage[i-1][j+1];
+
+                int val10 = inputImage[i][j-1];
+                int val11 = inputImage[i][j];
+                int val12 = inputImage[i][j+1];
+
+                int val20 = inputImage[i+1][j-1];
+                int val21 = inputImage[i+1][j];
+                int val22 = inputImage[i+1][j+1];
+
+                int gx =  ((-1 * val00) + (0 * val01) + (1 * val02)) 
+                        + ((-2 * val10) + (0 * val11) + (2 * val12))
+                        + ((-1 * val20) + (0 * val21) + (1 * val22));
+
+                int gy =  ((-1 * val00) + (-2 * val01) + (-1 * val02))
+                        + ((0 * val10) + (0 * val11) + (0 * val12))
+                        + ((1 * val20) + (2 * val21) + (1 * val22));
+
+                double gval = Math.sqrt((gx * gx) + (gy * gy));
+                int g = (int) gval;
+                if(g > 255) g = 255;
+                outputImage[i][j] = g;
+            }
+        }
+
+        for (int i = 1; i < x - 1; i++) {
+            for (int j = 1; j < y - 1; j++) {
+                int color = outputImage[i][j];
+                Color col = new Color(color, color, color);
+                bufferedImage.setRGB(i, j, col.getRGB());
+            }
+        }
+        try {
+            ImageIO.write(bufferedImage, "png", new File("edge"+".png"));
+            JOptionPane.showMessageDialog(null, "Image saved in your project");
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_edgeActionPerformed
+    
+    private void thresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thresActionPerformed
+        
+    }//GEN-LAST:event_thresActionPerformed
+
   
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -909,10 +1098,12 @@ public class HistogramProcessing extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem average;
     private javax.swing.JMenuItem bit;
+    private javax.swing.JMenuItem edge;
     private javax.swing.JMenuItem equalization;
     private javax.swing.JMenuItem exit;
     private javax.swing.JPanel graph;
     private javax.swing.JMenuItem laplacian;
+    private javax.swing.JMenuItem line;
     private javax.swing.JMenuItem log;
     private javax.swing.JMenuItem max;
     private javax.swing.JMenuItem median;
@@ -920,12 +1111,15 @@ public class HistogramProcessing extends javax.swing.JFrame {
     private javax.swing.JMenu menu_file;
     private javax.swing.JMenuItem min;
     private javax.swing.JMenuItem open;
+    private javax.swing.JMenuItem point;
     private javax.swing.JMenuItem power;
     private javax.swing.JMenuItem save;
+    private javax.swing.JMenu segment;
     private javax.swing.JMenu sharp;
     private javax.swing.JMenuItem show;
     private javax.swing.JMenu smooth;
     private javax.swing.JMenuItem sobel;
+    private javax.swing.JMenuItem thres;
     private javax.swing.JMenu transformations;
     private javax.swing.JMenuItem weighted;
     // End of variables declaration//GEN-END:variables
